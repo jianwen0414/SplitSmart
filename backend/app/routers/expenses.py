@@ -18,7 +18,9 @@ async def _to_read(db: AsyncSession, expense) -> ExpenseRead:
     splits = await expense_service.get_expense_splits(db, expense.id)
     return ExpenseRead(
         id=expense.id, group_id=expense.group_id, paid_by=expense.paid_by,
-        amount=expense.amount, currency=expense.currency, description=expense.description,
+        amount=expense.amount, currency=expense.currency,
+        converted_amount=expense.converted_amount, exchange_rate=expense.exchange_rate,
+        description=expense.description,
         category=expense.category, split_type=expense.split_type, receipt_url=expense.receipt_url,
         date=expense.date, created_at=expense.created_at, updated_at=expense.updated_at,
         splits=[SplitRead(user_id=s.user_id, amount=s.amount, percentage=s.percentage) for s in splits],
@@ -28,7 +30,7 @@ async def _to_read(db: AsyncSession, expense) -> ExpenseRead:
 @router.post("", response_model=ExpenseRead, status_code=status.HTTP_201_CREATED)
 async def create(group_id: UUID, payload: ExpenseCreate, user_id: UUID = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     await _assert_membership(db, group_id, user_id)
-    expense = await expense_service.create_expense(db, group_id, payload)
+    expense = await expense_service.create_expense(db, group_id, payload, user_id)
     return await _to_read(db, expense)
 
 

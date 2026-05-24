@@ -46,6 +46,8 @@ export interface Expense {
   paid_by: string;
   amount: string;
   currency: string;
+  converted_amount: string | null;
+  exchange_rate: string | null;
   description: string;
   category: Category;
   split_type: SplitType;
@@ -95,4 +97,82 @@ export interface ExpenseCreatePayload {
   paid_by: string;
   split_type: SplitType;
   splits: SplitInputPayload[];
+  receipt_url?: string | null;
+}
+
+export type ActivityAction =
+  | "expense_created" | "expense_updated" | "expense_deleted"
+  | "settlement_created" | "member_joined" | "member_left" | "group_updated";
+
+export interface Activity {
+  id: string;
+  group_id: string;
+  user_id: string;
+  action: ActivityAction;
+  entity_type: string;
+  entity_id: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface AnalyticsCategory { category: string; amount: string; percentage: number; }
+export interface AnalyticsDate { date: string; amount: string; }
+export interface AnalyticsMember { user_id: string; display_name: string; total_paid: string; total_share: string; net: string; }
+
+export interface AnalyticsResponse {
+  total_spending: string;
+  currency: string;
+  expense_count: number;
+  by_category: AnalyticsCategory[];
+  by_date: AnalyticsDate[];
+  by_member: AnalyticsMember[];
+}
+
+export interface ReceiptLineItem { description: string | null; amount: string | null; quantity: number | null; }
+export interface ReceiptData {
+  merchant: string | null;
+  total_amount: string | null;
+  currency: string | null;
+  date: string | null;
+  category: Category | null;
+  line_items: ReceiptLineItem[];
+}
+export interface ReceiptScanResponse {
+  success: boolean;
+  confidence?: "high" | "medium" | "low";
+  data?: ReceiptData;
+  receipt_url?: string;
+  error?: string;
+  raw_text?: string;
+}
+
+export interface ParsedExpenseData {
+  description: string | null;
+  amount: string | null;
+  currency: string | null;
+  category: Category | null;
+  date: string | null;
+  paid_by_name: string | null;
+  paid_by_user_id: string | null;
+  split_type: string | null;
+  split_among: string[];
+  split_among_user_ids: string[];
+  unmatched_names: string[];
+}
+export interface ParseExpenseResponse {
+  success: boolean;
+  confidence?: "high" | "medium" | "low";
+  data?: ParsedExpenseData;
+  error?: string;
+}
+
+export interface ExpenseInitial {
+  amount?: number;
+  currency?: string;
+  description?: string;
+  category?: Category;
+  date?: string;
+  paid_by?: string;
+  splitAmongUserIds?: string[];
+  receipt_url?: string;
 }

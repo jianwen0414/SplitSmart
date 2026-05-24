@@ -9,6 +9,7 @@ from app.models.expense import Expense, ExpenseSplit
 from app.models.settlement import Settlement
 from app.models.group import GroupMember
 from app.models.profile import Profile
+from app.services import activity_service
 
 CENT = Decimal("0.01")
 TOLERANCE = Decimal("0.01")
@@ -138,4 +139,12 @@ async def record_settlement(session: AsyncSession, group_id: UUID, paid_by: UUID
     )
     session.add(s)
     await session.flush()
+
+    name_res = await session.execute(select(Profile.display_name).where(Profile.id == paid_to))
+    paid_to_name = name_res.scalar_one_or_none() or ""
+    await activity_service.log(
+        session, group_id=group_id, user_id=paid_by,
+        action="settlement_created", entity_type="settlement", entity_id=s.id,
+        metadata={"paid_to_name": paid_to_name, "amount": str(_q(amount)), "currency": currency},
+    )
     return s

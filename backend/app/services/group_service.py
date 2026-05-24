@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.group import Group, GroupMember
 from app.models.profile import Profile
 from app.schemas.group import GroupCreate, GroupUpdate, MemberRead
+from app.services import activity_service
 
 
 async def create_group(session: AsyncSession, creator_id: UUID, payload: GroupCreate) -> Group:
@@ -64,6 +65,11 @@ async def update_group(session: AsyncSession, group_id: UUID, user_id: UUID, pay
     for k, v in data.items():
         setattr(group, k, v)
     await session.flush()
+    await activity_service.log(
+        session, group_id=group_id, user_id=user_id,
+        action="group_updated", entity_type="group", entity_id=group_id,
+        metadata={"fields": list(data.keys())},
+    )
     return group
 
 
@@ -76,9 +82,23 @@ async def join_group_by_invite(session: AsyncSession, user_id: UUID, invite_code
     if existing.scalar_one_or_none() is None:
         session.add(GroupMember(id=uuid4(), group_id=group.id, user_id=user_id, role="member"))
         await session.flush()
+        name_res = await session.execute(select(Profile.display_name).where(Profile.id == user_id))
+        member_name = name_res.scalar_one_or_none() or ""
+        await activity_service.log(
+            session, group_id=group.id, user_id=user_id,
+            action="member_joined", entity_type="member", entity_id=user_id,
+            metadata={"member_name": member_name},
+        )
     return group
 
 
 async def leave_group(session: AsyncSession, group_id: UUID, user_id: UUID) -> None:
+    name_res = await session.execute(select(Profile.display_name).where(Profile.id == user_id))
+    member_name = name_res.scalar_one_or_none() or ""
     await session.execute(delete(GroupMember).where(GroupMember.group_id == group_id, GroupMember.user_id == user_id))
     await session.flush()
+    await activity_service.log(
+        session, group_id=group_id, user_id=user_id,
+        action="member_left", entity_type="member", entity_id=user_id,
+        metadata={"member_name": member_name},
+    )

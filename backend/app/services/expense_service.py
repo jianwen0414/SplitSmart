@@ -7,8 +7,9 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.expense import Expense, ExpenseSplit
-from app.models.group import GroupMember
+from app.models.group import Group, GroupMember
 from app.schemas.expense import ExpenseCreate, ExpenseUpdate, SplitInput, VALID_CATEGORIES, VALID_SPLIT_TYPES
+from app.services import activity_service, currency_service
 
 CENT = Decimal("0.01")
 TOLERANCE = Decimal("0.01")
@@ -97,13 +98,28 @@ async def _verify_group_members(session: AsyncSession, group_id: UUID, user_ids:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, detail={"code": "VALIDATION_ERROR", "message": f"user {uid} is not a member of group {group_id}", "field": "splits"})
 
 
-async def create_expense(session: AsyncSession, group_id: UUID, payload: ExpenseCreate) -> Expense:
+async def _get_group_currency(session: AsyncSession, group_id: UUID) -> str:
+    res = await session.execute(select(Group.base_currency).where(Group.id == group_id))
+    row = res.scalar_one_or_none()
+    return row or "MYR"
+
+
+async def _apply_conversion(amount: Decimal, currency: str, base_currency: str) -> tuple[Decimal | None, Decimal | None]:
+    if currency.upper() == base_currency.upper():
+        return None, None
+    converted, rate = await currency_service.convert(amount, currency, base_currency)
+    return _q(converted), rate
+
+
+async def create_expense(session: AsyncSession, group_id: UUID, payload: ExpenseCreate, actor_id: UUID) -> Expense:
     if payload.category not in VALID_CATEGORIES:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail={"code": "VALIDATION_ERROR", "message": f"category must be one of {sorted(VALID_CATEGORIES)}", "field": "category"})
 
     await _verify_group_members(session, group_id, [payload.paid_by, *[s.user_id for s in payload.splits]])
-
     computed = compute_split_amounts(payload.split_type, payload.amount, payload.splits)
+
+    base_currency = await _get_group_currency(session, group_id)
+    converted_amount, exchange_rate = await _apply_conversion(payload.amount, payload.currency, base_currency)
 
     expense = Expense(
         id=uuid4(),
@@ -111,9 +127,12 @@ async def create_expense(session: AsyncSession, group_id: UUID, payload: Expense
         paid_by=payload.paid_by,
         amount=_q(payload.amount),
         currency=payload.currency,
+        converted_amount=converted_amount,
+        exchange_rate=exchange_rate,
         description=payload.description,
         category=payload.category,
         split_type=payload.split_type,
+        receipt_url=payload.receipt_url,
         date=payload.date or date_cls.today(),
     )
     session.add(expense)
@@ -121,13 +140,15 @@ async def create_expense(session: AsyncSession, group_id: UUID, payload: Expense
 
     for user_id, amount, pct in computed:
         session.add(ExpenseSplit(
-            id=uuid4(),
-            expense_id=expense.id,
-            user_id=user_id,
-            amount=amount,
-            percentage=pct,
+            id=uuid4(), expense_id=expense.id, user_id=user_id, amount=amount, percentage=pct,
         ))
     await session.flush()
+
+    await activity_service.log(
+        session, group_id=group_id, user_id=actor_id,
+        action="expense_created", entity_type="expense", entity_id=expense.id,
+        metadata={"description": expense.description, "amount": str(expense.amount), "currency": expense.currency},
+    )
     return expense
 
 
@@ -173,10 +194,22 @@ async def update_expense(session: AsyncSession, expense_id: UUID, payload: Expen
         expense.amount = new_amount
         expense.split_type = new_type
 
-    for field in ("currency", "description", "category", "date", "paid_by"):
+    for field in ("currency", "description", "category", "date", "paid_by", "receipt_url"):
         if field in data:
             setattr(expense, field, data[field])
+
+    if "amount" in data or "currency" in data:
+        base_currency = await _get_group_currency(session, expense.group_id)
+        converted_amount, exchange_rate = await _apply_conversion(expense.amount, expense.currency, base_currency)
+        expense.converted_amount = converted_amount
+        expense.exchange_rate = exchange_rate
+
     await session.flush()
+    await activity_service.log(
+        session, group_id=expense.group_id, user_id=actor_id,
+        action="expense_updated", entity_type="expense", entity_id=expense.id,
+        metadata={"description": expense.description, "amount": str(expense.amount), "currency": expense.currency},
+    )
     return expense
 
 
@@ -186,5 +219,12 @@ async def delete_expense(session: AsyncSession, expense_id: UUID, actor_id: UUID
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail={"code": "NOT_FOUND", "message": "expense not found"})
     if expense.paid_by != actor_id:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail={"code": "FORBIDDEN", "message": "only the original payer can delete this expense"})
+    group_id = expense.group_id
+    description = expense.description
     await session.delete(expense)
     await session.flush()
+    await activity_service.log(
+        session, group_id=group_id, user_id=actor_id,
+        action="expense_deleted", entity_type="expense", entity_id=expense_id,
+        metadata={"description": description},
+    )

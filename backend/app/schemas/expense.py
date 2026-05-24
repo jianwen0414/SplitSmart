@@ -22,6 +22,7 @@ class ExpenseCreate(BaseModel):
     paid_by: UUID
     split_type: str
     splits: list[SplitInput]
+    receipt_url: str | None = None
 
 
 class ExpenseUpdate(BaseModel):
@@ -49,6 +50,8 @@ class ExpenseRead(BaseModel):
     paid_by: UUID
     amount: Decimal
     currency: str
+    converted_amount: Decimal | None = None
+    exchange_rate: Decimal | None = None
     description: str
     category: str
     split_type: str
