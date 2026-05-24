@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Env files
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.local.example
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+.nyc_output/
+htmlcov/
+.coverage
+.coverage.*
+
+# GCP service account credentials — NEVER commit
+service_account*.json
+*-service-account.json
+gcp-credentials*.json
+
+# Misc
+*.swp
+*.swo
