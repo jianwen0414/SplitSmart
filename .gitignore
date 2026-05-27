@@ -58,3 +58,5 @@ gcp-credentials*.json
 # Misc
 *.swp
 *.swo
+
+Claude Code Design/

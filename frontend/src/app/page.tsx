@@ -4,10 +4,21 @@ import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-const HeroScene = dynamic(() => import("@/components/three/HeroScene"), { ssr: false });
+import {
+  Nav,
+  ScrollMarquee,
+  StatStrip,
+  HowItWorks,
+  FeatureGrid,
+  QuoteSection,
+  FinalCTA,
+  Footer,
+} from "@/components/landing/Sections";
+
+import "../styles/landing.css";
+
+const HeroScene = dynamic(() => import("@/components/landing/HeroScene"), { ssr: false });
 
 export default function LandingPage() {
   const { session, loading } = useAuth();
@@ -18,44 +29,55 @@ export default function LandingPage() {
   }, [loading, session, router]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-brand-50 via-white to-white">
-      <div className="relative h-[60vh] min-h-[400px] overflow-hidden">
-        <div className="absolute inset-0 z-0"><HeroScene /></div>
-        <section className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-4 text-center">
-          <h1 className="text-balance text-5xl font-bold tracking-tight text-slate-900 drop-shadow-sm sm:text-6xl">
-            SplitSmart
-          </h1>
-          <p className="mt-4 text-lg text-slate-700">Split expenses. Not friendships.</p>
-          <div className="mt-8 flex gap-3">
-            <Link href="/register"><Button size="lg">Get started</Button></Link>
-            <Link href="/login"><Button size="lg" variant="outline">Sign in</Button></Link>
-          </div>
-        </section>
-      </div>
+    <main className="ss-page">
+      <Nav />
 
-      <section className="mx-auto grid max-w-5xl grid-cols-1 gap-4 px-4 pb-20 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Smart splitting</CardTitle>
-            <CardDescription>Equal, exact, or percentage — the math is on us.</CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm text-slate-600">Track every shared expense and see who owes whom in seconds.</CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>AI Receipt scanner</CardTitle>
-            <CardDescription>Snap a photo. Gemini fills the form.</CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm text-slate-600">Vertex AI extracts merchant, total, date, and category instantly.</CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Multi-currency</CardTitle>
-            <CardDescription>Trips across borders, no math headaches.</CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm text-slate-600">Log expenses in any currency — balances always reconcile to the group base.</CardContent>
-        </Card>
+      <section className="hero">
+        <HeroScene>
+          <div className="hero-text-layer">
+            <div className="hero-copy">
+              <div className="eyebrow mono">
+                <span className="eyebrow-dot" />
+                FOR ROOMMATES, TRIPS, &amp; EVERY DINNER IN-BETWEEN
+              </div>
+
+              <h1 className="hero-title serif">
+                Split <em>expenses.</em>
+                <br />
+                Not <span className="hero-strike">friendships.</span>
+              </h1>
+
+              <p className="hero-sub">
+                Track who paid, who owes, and settle the whole thing in a tap.
+                No math, no spreadsheets, no &ldquo;I&rsquo;ll Venmo you later.&rdquo;
+              </p>
+
+              <div className="hero-ctas">
+                <Link href="/register" className="btn btn-primary">
+                  <span>Get started</span>
+                  <svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path d="M5 12h14M13 5l7 7-7 7" />
+                  </svg>
+                </Link>
+                <Link href="/login" className="btn btn-ghost">Sign in</Link>
+              </div>
+
+              <div className="hero-hint mono">
+                <span className="hero-hint-arrow">↳</span>
+                Try it — grab the money. Tap a coin to flip.
+              </div>
+            </div>
+          </div>
+        </HeroScene>
       </section>
+
+      <ScrollMarquee />
+      <StatStrip />
+      <HowItWorks />
+      <FeatureGrid />
+      <QuoteSection />
+      <FinalCTA />
+      <Footer />
     </main>
   );
 }
