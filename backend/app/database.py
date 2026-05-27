@@ -10,7 +10,16 @@ class Base(DeclarativeBase):
 
 
 _settings = get_settings()
-_engine = create_async_engine(_settings.DATABASE_URL, echo=False, future=True) if _settings.DATABASE_URL else None
+_engine = create_async_engine(
+    _settings.DATABASE_URL,
+    echo=False,
+    future=True,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    pool_size=5,
+    max_overflow=10,
+    connect_args={"ssl": "require"},
+) if _settings.DATABASE_URL else None
 _SessionLocal = async_sessionmaker(_engine, expire_on_commit=False, class_=AsyncSession) if _engine else None
 
 
