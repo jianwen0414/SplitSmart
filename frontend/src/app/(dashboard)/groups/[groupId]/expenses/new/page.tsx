@@ -16,13 +16,20 @@ export default function NewExpensePage({ params }: { params: { groupId: string }
   const { group, loading } = useGroupDetail(groupId);
   const { create } = useExpenses(groupId);
   const [initial, setInitial] = useState<ExpenseInitial | undefined>(undefined);
+  const [prefillSource, setPrefillSource] = useState<"scan" | "quick" | null>(null);
   const [activeTab, setActiveTab] = useState("manual");
 
   if (loading || !group) return <p className="text-sm text-slate-500">Loading...</p>;
 
-  const handlePrefill = (data: ExpenseInitial) => {
+  const handlePrefill = (data: ExpenseInitial, source: "scan" | "quick") => {
     setInitial(data);
+    setPrefillSource(source);
     setActiveTab("manual");
+  };
+
+  const handleTabChange = (tab: string) => {
+    if (tab !== "manual") { setInitial(undefined); setPrefillSource(null); }
+    setActiveTab(tab);
   };
 
   return (
@@ -33,13 +40,21 @@ export default function NewExpensePage({ params }: { params: { groupId: string }
           <CardDescription>Manual, scan a receipt, or describe it in plain English.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue={activeTab} key={activeTab}>
+          <Tabs value={activeTab} onValueChange={handleTabChange}>
             <TabsList>
               <TabsTrigger value="manual">Manual</TabsTrigger>
               <TabsTrigger value="scan">Scan receipt</TabsTrigger>
               <TabsTrigger value="quick">Quick entry</TabsTrigger>
             </TabsList>
             <TabsContent value="manual">
+              {initial && (
+                <div className="mb-4 flex items-center gap-2 rounded-md bg-emerald-50 border border-emerald-200 px-4 py-2.5 text-sm text-emerald-700">
+                  <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {prefillSource === "scan" ? "Form pre-filled from receipt scan" : "Form pre-filled from quick entry"} — review and confirm.
+                </div>
+              )}
               <ExpenseForm
                 members={group.members}
                 defaultCurrency={group.base_currency}
@@ -51,10 +66,10 @@ export default function NewExpensePage({ params }: { params: { groupId: string }
               />
             </TabsContent>
             <TabsContent value="scan">
-              <ReceiptScanner groupId={groupId} onParsed={handlePrefill} />
+              <ReceiptScanner groupId={groupId} onParsed={(data) => handlePrefill(data, "scan")} />
             </TabsContent>
             <TabsContent value="quick">
-              <NaturalLanguageInput groupId={groupId} members={group.members} onParsed={handlePrefill} />
+              <NaturalLanguageInput groupId={groupId} members={group.members} onParsed={(data) => handlePrefill(data, "quick")} />
             </TabsContent>
           </Tabs>
         </CardContent>

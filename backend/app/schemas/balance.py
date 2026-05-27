@@ -1,6 +1,6 @@
 from decimal import Decimal
 from uuid import UUID
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MemberBalance(BaseModel):
@@ -19,7 +19,7 @@ class SettlementPlanParty(BaseModel):
 
 
 class SettlementPlanItem(BaseModel):
-    from_: SettlementPlanParty
+    from_: SettlementPlanParty = Field(..., alias="from")
     to: SettlementPlanParty
     amount: Decimal
     currency: str
