@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { ExpenseInitial, ReceiptScanResponse } from "@/lib/types";
+import { ExpenseInitial, ItemInput, ReceiptScanResponse } from "@/lib/types";
 
 interface Props {
   groupId: string;
@@ -31,14 +31,35 @@ export function ReceiptScanner({ groupId, onParsed }: Props) {
         return;
       }
       const d = res.data.data;
+      const totalNum = d.total_amount ? parseFloat(d.total_amount) : 0;
+
+      const items: ItemInput[] = (d.line_items ?? [])
+        .filter((li) => li.description && li.amount != null)
+        .map((li) => ({
+          description: li.description ?? "",
+          unit_amount: parseFloat(li.amount ?? "0"),
+          quantity: li.quantity && li.quantity > 0 ? li.quantity : 1,
+          consumers: [],
+        }));
+      const itemSum = items.reduce((acc, it) => acc + it.unit_amount * it.quantity, 0);
+      const taxAndService = Math.max(0, totalNum - itemSum);
+
       const parsed: ExpenseInitial = {
-        amount: d.total_amount ? parseFloat(d.total_amount) : undefined,
+        amount: totalNum || undefined,
         currency: d.currency || undefined,
         description: d.merchant || undefined,
         category: d.category || undefined,
         date: d.date || undefined,
         receipt_url: res.data.receipt_url,
       };
+
+      if (items.length > 0 && totalNum > 0) {
+        parsed.split_type = "itemized";
+        parsed.items = items;
+        parsed.tax_amount = taxAndService > 0.01 ? Math.round(taxAndService * 100) / 100 : 0;
+        parsed.service_charge_amount = 0;
+      }
+
       setSuccess(true);
       setTimeout(() => onParsed(parsed), 900);
     } catch (e: any) {
@@ -50,7 +71,7 @@ export function ReceiptScanner({ groupId, onParsed }: Props) {
 
   return (
     <div className="flex flex-col gap-3 pt-2">
-      <p className="text-sm text-slate-600">Upload a photo of the receipt. Gemini extracts merchant, total, date, and category — you confirm before saving.</p>
+      <p className="text-sm text-slate-600">Upload a photo of the receipt. Gemini extracts merchant, total, date, line items, and category. The form pre-fills in <strong>By items</strong> mode — tap who consumed each item, confirm, save.</p>
       <input
         ref={inputRef}
         type="file"

@@ -1,4 +1,4 @@
-export type SplitType = "equal" | "exact" | "percentage";
+export type SplitType = "equal" | "exact" | "percentage" | "itemized";
 
 export type Category =
   | "food" | "transport" | "accommodation" | "entertainment"
@@ -40,6 +40,32 @@ export interface ExpenseSplit {
   percentage: string | null;
 }
 
+export interface ItemConsumerInput {
+  user_id: string;
+  share_weight?: number;
+}
+
+export interface ItemInput {
+  description: string;
+  unit_amount: number;
+  quantity: number;
+  consumers: ItemConsumerInput[];
+}
+
+export interface ItemConsumerRead {
+  user_id: string;
+  share_weight: string;
+}
+
+export interface ExpenseItem {
+  id: string;
+  description: string;
+  unit_amount: string;
+  quantity: number;
+  position: number;
+  consumers: ItemConsumerRead[];
+}
+
 export interface Expense {
   id: string;
   group_id: string;
@@ -51,11 +77,14 @@ export interface Expense {
   description: string;
   category: Category;
   split_type: SplitType;
+  tax_amount: string;
+  service_charge_amount: string;
   receipt_url: string | null;
   date: string;
   created_at: string;
   updated_at: string;
   splits: ExpenseSplit[];
+  items: ExpenseItem[];
 }
 
 export interface MemberBalance {
@@ -97,6 +126,9 @@ export interface ExpenseCreatePayload {
   paid_by: string;
   split_type: SplitType;
   splits: SplitInputPayload[];
+  items?: ItemInput[];
+  tax_amount?: number;
+  service_charge_amount?: number;
   receipt_url?: string | null;
 }
 
@@ -175,4 +207,8 @@ export interface ExpenseInitial {
   paid_by?: string;
   splitAmongUserIds?: string[];
   receipt_url?: string;
+  split_type?: SplitType;
+  items?: ItemInput[];
+  tax_amount?: number;
+  service_charge_amount?: number;
 }

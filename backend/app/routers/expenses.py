@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseRead, SplitRead
+from app.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseRead, SplitRead, ItemRead, ItemConsumerRead
 from app.services import expense_service, group_service
 from app.utils.auth import get_current_user_id
 
@@ -16,14 +16,29 @@ async def _assert_membership(db: AsyncSession, group_id: UUID, user_id: UUID) ->
 
 async def _to_read(db: AsyncSession, expense) -> ExpenseRead:
     splits = await expense_service.get_expense_splits(db, expense.id)
+    items_with_consumers = await expense_service.get_expense_items(db, expense.id)
+    items_read = [
+        ItemRead(
+            id=item.id,
+            description=item.description,
+            unit_amount=item.unit_amount,
+            quantity=item.quantity,
+            position=item.position,
+            consumers=[ItemConsumerRead(user_id=c.user_id, share_weight=c.share_weight) for c in consumers],
+        )
+        for item, consumers in items_with_consumers
+    ]
     return ExpenseRead(
         id=expense.id, group_id=expense.group_id, paid_by=expense.paid_by,
         amount=expense.amount, currency=expense.currency,
         converted_amount=expense.converted_amount, exchange_rate=expense.exchange_rate,
         description=expense.description,
-        category=expense.category, split_type=expense.split_type, receipt_url=expense.receipt_url,
+        category=expense.category, split_type=expense.split_type,
+        tax_amount=expense.tax_amount, service_charge_amount=expense.service_charge_amount,
+        receipt_url=expense.receipt_url,
         date=expense.date, created_at=expense.created_at, updated_at=expense.updated_at,
         splits=[SplitRead(user_id=s.user_id, amount=s.amount, percentage=s.percentage) for s in splits],
+        items=items_read,
     )
 
 

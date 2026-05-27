@@ -6,14 +6,18 @@ import { formatMoney } from "@/lib/utils";
 export function ExpenseCard({ expense, members, baseCurrency }: { expense: Expense; members: Member[]; baseCurrency?: string }) {
   const payer = members.find((m) => m.user_id === expense.paid_by);
   const isConverted = expense.converted_amount && baseCurrency && expense.currency.toUpperCase() !== baseCurrency.toUpperCase();
+  const itemCount = expense.items?.length ?? 0;
   return (
     <Card>
       <CardContent className="flex items-center justify-between gap-4 py-4">
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="font-medium text-slate-900">{expense.description}</span>
             <Badge>{expense.category}</Badge>
             <Badge variant="brand">{expense.split_type}</Badge>
+            {expense.split_type === "itemized" && itemCount > 0 && (
+              <Badge variant="success">{itemCount} item{itemCount === 1 ? "" : "s"}</Badge>
+            )}
             {expense.receipt_url && <Badge variant="success">receipt</Badge>}
           </div>
           <p className="text-xs text-slate-500">
