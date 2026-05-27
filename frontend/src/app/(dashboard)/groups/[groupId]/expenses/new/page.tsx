@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useGroupDetail } from "@/hooks/useGroups";
 import { useExpenses } from "@/hooks/useExpenses";
@@ -33,7 +34,13 @@ export default function NewExpensePage({ params }: { params: { groupId: string }
   };
 
   return (
-    <div className="mx-auto max-w-xl">
+    <div className="mx-auto max-w-xl flex flex-col gap-3">
+      <Link href={`/groups/${groupId}`} className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 w-fit">
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        {group.name}
+      </Link>
       <Card>
         <CardHeader>
           <CardTitle>New expense</CardTitle>

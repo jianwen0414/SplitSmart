@@ -51,7 +51,13 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
     <div className="flex flex-col gap-6">
       {showConfetti && <SettlementConfetti />}
       <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
+        <div className="flex flex-col gap-1">
+          <Link href="/groups" className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 w-fit">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            All groups
+          </Link>
           <h1 className="text-2xl font-semibold text-slate-900">{group.name}</h1>
           <p className="text-sm text-slate-500">
             {group.description || "No description"} ·{" "}
