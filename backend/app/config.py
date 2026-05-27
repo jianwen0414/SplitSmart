@@ -8,12 +8,13 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_SERVICE_KEY: str = ""
     SUPABASE_ANON_KEY: str = ""
+
     DATABASE_URL: str = ""
     # Vertex AI auth via service account JSON file.
     GOOGLE_APPLICATION_CREDENTIALS: str = ""
     GCP_PROJECT_ID: str = ""
     GCP_LOCATION: str = "us-central1"
-    GEMINI_MODEL: str = "gemini-2.0-flash"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
     ENVIRONMENT: str = "development"
     ALLOWED_ORIGINS: str = "http://localhost:3000"
 

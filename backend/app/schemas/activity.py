@@ -11,5 +11,5 @@ class ActivityRead(BaseModel):
     action: str
     entity_type: str
     entity_id: UUID | None = None
-    activity_metadata: dict = Field(default_factory=dict, alias="metadata")
+    metadata: dict = Field(default_factory=dict, validation_alias="activity_metadata")
     created_at: datetime
