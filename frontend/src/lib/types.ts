@@ -1,15 +1,40 @@
 export type SplitType = "equal" | "exact" | "percentage" | "itemized";
 
 export type Category =
-  | "food" | "transport" | "accommodation" | "entertainment"
-  | "shopping" | "utilities" | "groceries" | "general";
+  | "food"
+  | "transport"
+  | "accommodation"
+  | "entertainment"
+  | "shopping"
+  | "utilities"
+  | "groceries"
+  | "general";
 
 export const CATEGORIES: Category[] = [
-  "food", "transport", "accommodation", "entertainment",
-  "shopping", "utilities", "groceries", "general",
+  "food",
+  "transport",
+  "accommodation",
+  "entertainment",
+  "shopping",
+  "utilities",
+  "groceries",
+  "general",
 ];
 
-export const CURRENCIES = ["MYR", "USD", "SGD", "THB", "IDR", "PHP", "EUR", "GBP", "JPY", "KRW", "AUD", "CNY"];
+export const CURRENCIES = [
+  "MYR",
+  "USD",
+  "SGD",
+  "THB",
+  "IDR",
+  "PHP",
+  "EUR",
+  "GBP",
+  "JPY",
+  "KRW",
+  "AUD",
+  "CNY",
+];
 
 export interface Group {
   id: string;
@@ -133,8 +158,13 @@ export interface ExpenseCreatePayload {
 }
 
 export type ActivityAction =
-  | "expense_created" | "expense_updated" | "expense_deleted"
-  | "settlement_created" | "member_joined" | "member_left" | "group_updated";
+  | "expense_created"
+  | "expense_updated"
+  | "expense_deleted"
+  | "settlement_created"
+  | "member_joined"
+  | "member_left"
+  | "group_updated";
 
 export interface Activity {
   id: string;
@@ -147,9 +177,22 @@ export interface Activity {
   created_at: string;
 }
 
-export interface AnalyticsCategory { category: string; amount: string; percentage: number; }
-export interface AnalyticsDate { date: string; amount: string; }
-export interface AnalyticsMember { user_id: string; display_name: string; total_paid: string; total_share: string; net: string; }
+export interface AnalyticsCategory {
+  category: string;
+  amount: string;
+  percentage: number;
+}
+export interface AnalyticsDate {
+  date: string;
+  amount: string;
+}
+export interface AnalyticsMember {
+  user_id: string;
+  display_name: string;
+  total_paid: string;
+  total_share: string;
+  net: string;
+}
 
 export interface AnalyticsResponse {
   total_spending: string;
@@ -160,7 +203,11 @@ export interface AnalyticsResponse {
   by_member: AnalyticsMember[];
 }
 
-export interface ReceiptLineItem { description: string | null; amount: string | null; quantity: number | null; }
+export interface ReceiptLineItem {
+  description: string | null;
+  amount: string | null;
+  quantity: number | null;
+}
 export interface ReceiptData {
   merchant: string | null;
   total_amount: string | null;

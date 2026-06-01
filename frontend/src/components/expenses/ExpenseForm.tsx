@@ -16,6 +16,7 @@ import {
 } from "@/lib/types";
 import { SplitSelector, buildSplitsPayload, validateSplitsClientSide } from "./SplitSelector";
 import { ItemizedSplit, validateItemizedClientSide } from "./ItemizedSplit";
+import { getErrorMessage } from "@/lib/api";
 
 interface Props {
   members: Member[];
@@ -86,16 +87,21 @@ export function ExpenseForm({ members, defaultCurrency, initial, onSubmit }: Pro
       setSubmitting(true);
       try {
         await onSubmit({
-          amount: totalAmount, currency, description: description.trim(), category,
-          date, paid_by: paidBy, split_type: "itemized",
+          amount: totalAmount,
+          currency,
+          description: description.trim(),
+          category,
+          date,
+          paid_by: paidBy,
+          split_type: "itemized",
           splits: [],
           items,
           tax_amount: tax,
           service_charge_amount: service,
           receipt_url: initial?.receipt_url ?? null,
         });
-      } catch (err: any) {
-        setError(err?.response?.data?.detail?.message || err?.message || "Failed to create expense");
+      } catch (err: unknown) {
+        setError(getErrorMessage(err, "Failed to create expense"));
       } finally {
         setSubmitting(false);
       }
@@ -109,12 +115,18 @@ export function ExpenseForm({ members, defaultCurrency, initial, onSubmit }: Pro
     setSubmitting(true);
     try {
       await onSubmit({
-        amount: totalAmount, currency, description: description.trim(), category,
-        date, paid_by: paidBy, split_type: splitType, splits,
+        amount: totalAmount,
+        currency,
+        description: description.trim(),
+        category,
+        date,
+        paid_by: paidBy,
+        split_type: splitType,
+        splits,
         receipt_url: initial?.receipt_url ?? null,
       });
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.message || err?.message || "Failed to create expense");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Failed to create expense"));
     } finally {
       setSubmitting(false);
     }
@@ -124,18 +136,36 @@ export function ExpenseForm({ members, defaultCurrency, initial, onSubmit }: Pro
     <form onSubmit={handle} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="desc">Description</Label>
-        <Input id="desc" required value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Dinner at Jalan Alor" />
+        <Input
+          id="desc"
+          required
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="e.g. Dinner at Jalan Alor"
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="amt">Amount</Label>
-          <Input id="amt" type="number" step="0.01" min="0" required value={amount} onChange={(e) => setAmount(e.target.value)} />
+          <Input
+            id="amt"
+            type="number"
+            step="0.01"
+            min="0"
+            required
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="cur">Currency</Label>
           <Select id="cur" value={currency} onChange={(e) => setCurrency(e.target.value)}>
-            {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            {CURRENCIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
           </Select>
         </div>
       </div>
@@ -143,8 +173,16 @@ export function ExpenseForm({ members, defaultCurrency, initial, onSubmit }: Pro
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="cat">Category</Label>
-          <Select id="cat" value={category} onChange={(e) => setCategory(e.target.value as Category)}>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          <Select
+            id="cat"
+            value={category}
+            onChange={(e) => setCategory(e.target.value as Category)}
+          >
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
           </Select>
         </div>
         <div className="flex flex-col gap-1.5">
@@ -156,13 +194,21 @@ export function ExpenseForm({ members, defaultCurrency, initial, onSubmit }: Pro
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="paid">Paid by</Label>
         <Select id="paid" value={paidBy} onChange={(e) => setPaidBy(e.target.value)}>
-          {members.map((m) => <option key={m.user_id} value={m.user_id}>{m.display_name}</option>)}
+          {members.map((m) => (
+            <option key={m.user_id} value={m.user_id}>
+              {m.display_name}
+            </option>
+          ))}
         </Select>
       </div>
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="stype">Split type</Label>
-        <Select id="stype" value={splitType} onChange={(e) => setSplitType(e.target.value as SplitType)}>
+        <Select
+          id="stype"
+          value={splitType}
+          onChange={(e) => setSplitType(e.target.value as SplitType)}
+        >
           <option value="equal">Equal</option>
           <option value="exact">Exact amounts</option>
           <option value="percentage">Percentage</option>
@@ -188,17 +234,24 @@ export function ExpenseForm({ members, defaultCurrency, initial, onSubmit }: Pro
         <div className="flex flex-col gap-1.5">
           <Label>Split among</Label>
           <SplitSelector
-            members={members} splitType={splitType} totalAmount={totalAmount}
-            selected={selected} setSelected={setSelected}
-            exactAmounts={exactAmounts} setExactAmounts={setExactAmounts}
-            percentages={percentages} setPercentages={setPercentages}
+            members={members}
+            splitType={splitType}
+            totalAmount={totalAmount}
+            selected={selected}
+            setSelected={setSelected}
+            exactAmounts={exactAmounts}
+            setExactAmounts={setExactAmounts}
+            percentages={percentages}
+            setPercentages={setPercentages}
           />
         </div>
       )}
 
       {initial?.receipt_url && <p className="text-xs text-emerald-600">Receipt attached.</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Add expense"}</Button>
+      <Button type="submit" disabled={submitting}>
+        {submitting ? "Saving..." : "Add expense"}
+      </Button>
     </form>
   );
 }

@@ -17,7 +17,13 @@ interface TabsProps {
   className?: string;
 }
 
-export function Tabs({ defaultValue, value: controlledValue, onValueChange, children, className }: TabsProps) {
+export function Tabs({
+  defaultValue,
+  value: controlledValue,
+  onValueChange,
+  children,
+  className,
+}: TabsProps) {
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? "");
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;
@@ -32,11 +38,34 @@ export function Tabs({ defaultValue, value: controlledValue, onValueChange, chil
   );
 }
 
-export function TabsList({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn("inline-flex h-10 items-center justify-start rounded-md bg-slate-100 p-1 gap-1", className)}>{children}</div>;
+export function TabsList({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "inline-flex h-10 items-center justify-start rounded-md bg-slate-100 p-1 gap-1",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
 }
 
-export function TabsTrigger({ value, children, className }: { value: string; children: React.ReactNode; className?: string }) {
+export function TabsTrigger({
+  value,
+  children,
+  className,
+}: {
+  value: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   const ctx = React.useContext(TabsContext);
   if (!ctx) throw new Error("TabsTrigger outside Tabs");
   const active = ctx.value === value;
@@ -47,7 +76,7 @@ export function TabsTrigger({ value, children, className }: { value: string; chi
       className={cn(
         "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all",
         active ? "bg-white text-slate-900 shadow" : "text-slate-600 hover:text-slate-900",
-        className,
+        className
       )}
     >
       {children}
@@ -55,7 +84,15 @@ export function TabsTrigger({ value, children, className }: { value: string; chi
   );
 }
 
-export function TabsContent({ value, children, className }: { value: string; children: React.ReactNode; className?: string }) {
+export function TabsContent({
+  value,
+  children,
+  className,
+}: {
+  value: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   const ctx = React.useContext(TabsContext);
   if (!ctx) throw new Error("TabsContent outside Tabs");
   if (ctx.value !== value) return null;

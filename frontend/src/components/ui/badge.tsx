@@ -8,6 +8,19 @@ const variants = {
   danger: "bg-red-100 text-red-700",
 } as const;
 
-export function Badge({ className, variant = "default", ...props }: React.HTMLAttributes<HTMLSpanElement> & { variant?: keyof typeof variants }) {
-  return <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", variants[variant], className)} {...props} />;
+export function Badge({
+  className,
+  variant = "default",
+  ...props
+}: React.HTMLAttributes<HTMLSpanElement> & { variant?: keyof typeof variants }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+        variants[variant],
+        className
+      )}
+      {...props}
+    />
+  );
 }

@@ -1,8 +1,11 @@
 "use client";
 import { useRef, useState } from "react";
-import { api } from "@/lib/api";
+import { api, getErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { ExpenseInitial, ItemInput, ReceiptScanResponse } from "@/lib/types";
+
+// Delay before handing parsed data to the form, so the success state is visible.
+const SUCCESS_DISPLAY_MS = 900;
 
 interface Props {
   groupId: string;
@@ -61,9 +64,9 @@ export function ReceiptScanner({ groupId, onParsed }: Props) {
       }
 
       setSuccess(true);
-      setTimeout(() => onParsed(parsed), 900);
-    } catch (e: any) {
-      setError(e?.response?.data?.detail?.message || e?.message || "Upload failed");
+      setTimeout(() => onParsed(parsed), SUCCESS_DISPLAY_MS);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e, "Upload failed"));
     } finally {
       setLoading(false);
     }
@@ -71,7 +74,11 @@ export function ReceiptScanner({ groupId, onParsed }: Props) {
 
   return (
     <div className="flex flex-col gap-3 pt-2">
-      <p className="text-sm text-slate-600">Upload a photo of the receipt. Gemini extracts merchant, total, date, line items, and category. The form pre-fills in <strong>By items</strong> mode — tap who consumed each item, confirm, save.</p>
+      <p className="text-sm text-slate-600">
+        Upload a photo of the receipt. Gemini extracts merchant, total, date, line items, and
+        category. The form pre-fills in <strong>By items</strong> mode — tap who consumed each item,
+        confirm, save.
+      </p>
       <input
         ref={inputRef}
         type="file"

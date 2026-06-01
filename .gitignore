@@ -60,3 +60,5 @@ gcp-credentials*.json
 *.swo
 
 Claude Code Design/
+# Product spec — keep local, not for evaluator
+SplitSmart_PRD.md

@@ -47,21 +47,44 @@ export default function RegisterPage() {
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="name">Display name</Label>
-              <Input id="name" required value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+              <Input
+                id="name"
+                required
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                id="password"
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
             {info && <p className="text-sm text-emerald-600">{info}</p>}
-            <Button type="submit" disabled={submitting}>{submitting ? "Creating..." : "Create account"}</Button>
+            <Button type="submit" disabled={submitting}>
+              {submitting ? "Creating..." : "Create account"}
+            </Button>
             <p className="text-center text-sm text-slate-500">
-              Already have an account? <Link href="/login" className="text-brand-600 hover:underline">Sign in</Link>
+              Already have an account?{" "}
+              <Link href="/login" className="text-brand-600 hover:underline">
+                Sign in
+              </Link>
             </p>
           </form>
         </CardContent>

@@ -19,23 +19,31 @@ export function buildSplitsPayload(
   splitType: SplitType,
   selected: Record<string, boolean>,
   exactAmounts: Record<string, string>,
-  percentages: Record<string, string>,
+  percentages: Record<string, string>
 ): SplitInputPayload[] {
   const includedIds = Object.keys(selected).filter((k) => selected[k]);
   if (splitType === "equal") return includedIds.map((user_id) => ({ user_id }));
-  if (splitType === "exact") return includedIds.map((user_id) => ({ user_id, amount: parseFloat(exactAmounts[user_id] || "0") }));
-  return includedIds.map((user_id) => ({ user_id, percentage: parseFloat(percentages[user_id] || "0") }));
+  if (splitType === "exact")
+    return includedIds.map((user_id) => ({
+      user_id,
+      amount: parseFloat(exactAmounts[user_id] || "0"),
+    }));
+  return includedIds.map((user_id) => ({
+    user_id,
+    percentage: parseFloat(percentages[user_id] || "0"),
+  }));
 }
 
 export function validateSplitsClientSide(
   splitType: SplitType,
   totalAmount: number,
-  payload: SplitInputPayload[],
+  payload: SplitInputPayload[]
 ): string | null {
   if (payload.length === 0) return "Select at least one member to split with";
   if (splitType === "exact") {
     const sum = payload.reduce((acc, p) => acc + (p.amount || 0), 0);
-    if (Math.abs(sum - totalAmount) > 0.01) return `Exact split sum (${sum.toFixed(2)}) must equal total (${totalAmount.toFixed(2)})`;
+    if (Math.abs(sum - totalAmount) > 0.01)
+      return `Exact split sum (${sum.toFixed(2)}) must equal total (${totalAmount.toFixed(2)})`;
   }
   if (splitType === "percentage") {
     const sum = payload.reduce((acc, p) => acc + (p.percentage || 0), 0);
@@ -45,10 +53,15 @@ export function validateSplitsClientSide(
 }
 
 export function SplitSelector({
-  members, splitType, totalAmount,
-  selected, setSelected,
-  exactAmounts, setExactAmounts,
-  percentages, setPercentages,
+  members,
+  splitType,
+  totalAmount,
+  selected,
+  setSelected,
+  exactAmounts,
+  setExactAmounts,
+  percentages,
+  setPercentages,
 }: Props) {
   const toggle = (uid: string) => setSelected({ ...selected, [uid]: !selected[uid] });
 
@@ -65,10 +78,14 @@ export function SplitSelector({
               className="h-4 w-4"
               id={`split-${m.user_id}`}
             />
-            <Label htmlFor={`split-${m.user_id}`} className="flex-1 font-normal">{m.display_name}</Label>
+            <Label htmlFor={`split-${m.user_id}`} className="flex-1 font-normal">
+              {m.display_name}
+            </Label>
             {checked && splitType === "exact" && (
               <Input
-                type="number" step="0.01" min="0"
+                type="number"
+                step="0.01"
+                min="0"
                 value={exactAmounts[m.user_id] ?? ""}
                 onChange={(e) => setExactAmounts({ ...exactAmounts, [m.user_id]: e.target.value })}
                 placeholder="0.00"
@@ -77,7 +94,10 @@ export function SplitSelector({
             )}
             {checked && splitType === "percentage" && (
               <Input
-                type="number" step="0.01" min="0" max="100"
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
                 value={percentages[m.user_id] ?? ""}
                 onChange={(e) => setPercentages({ ...percentages, [m.user_id]: e.target.value })}
                 placeholder="%"

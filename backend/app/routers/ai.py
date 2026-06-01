@@ -1,11 +1,12 @@
 """AI router — receipt OCR + NLP expense parsing + auth/health probes."""
 from datetime import date as DateT
 from uuid import UUID
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 
 from app.schemas.ai import ParseExpenseRequest, ParseExpenseResponse, ReceiptScanResponse
 from app.services import ai_service, storage_service
 from app.utils.auth import get_current_user, get_current_user_id
+from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
@@ -18,20 +19,10 @@ async def health(_user: dict = Depends(get_current_user)) -> dict:
     return ai_service.health_check()
 
 
-@router.post("/echo")
-async def echo(payload: dict, _user: dict = Depends(get_current_user)) -> dict:
-    prompt = (payload or {}).get("prompt", "").strip()
-    if not prompt:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail={"code": "VALIDATION_ERROR", "message": "prompt is required"})
-    try:
-        text = ai_service.generate_text(prompt)
-    except Exception as e:
-        raise HTTPException(status.HTTP_502_BAD_GATEWAY, detail={"code": "AI_ERROR", "message": str(e)})
-    return {"response": text}
-
-
 @router.post("/scan-receipt", response_model=ReceiptScanResponse)
+@limiter.limit("15/minute")
 async def scan_receipt(
+    request: Request,
     file: UploadFile = File(...),
     group_id: str = Form(...),
     _user_id: UUID = Depends(get_current_user_id),
@@ -53,6 +44,7 @@ async def scan_receipt(
 
 
 @router.post("/parse-expense", response_model=ParseExpenseResponse)
-async def parse_expense(payload: ParseExpenseRequest, _user_id: UUID = Depends(get_current_user_id)):
+@limiter.limit("15/minute")
+async def parse_expense(request: Request, payload: ParseExpenseRequest, _user_id: UUID = Depends(get_current_user_id)):
     members = [{"user_id": m.user_id, "display_name": m.display_name} for m in payload.group_members]
     return await ai_service.parse_expense_text(payload.text, members, DateT.today())

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { api } from "@/lib/api";
+import { api, getErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ExpenseInitial, Member, ParseExpenseResponse } from "@/lib/types";
@@ -20,7 +20,10 @@ export function NaturalLanguageInput({ groupId, members, onParsed }: Props) {
   const handle = async () => {
     setError(null);
     setWarn(null);
-    if (!text.trim()) { setError("Type something first"); return; }
+    if (!text.trim()) {
+      setError("Type something first");
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.post<ParseExpenseResponse>("/ai/parse-expense", {
@@ -43,8 +46,8 @@ export function NaturalLanguageInput({ groupId, members, onParsed }: Props) {
         paid_by: d.paid_by_user_id || undefined,
         splitAmongUserIds: d.split_among_user_ids.length > 0 ? d.split_among_user_ids : undefined,
       });
-    } catch (e: any) {
-      setError(e?.response?.data?.detail?.message || e?.message || "Parse failed");
+    } catch (e: unknown) {
+      setError(getErrorMessage(e, "Parse failed"));
     } finally {
       setLoading(false);
     }
@@ -52,11 +55,19 @@ export function NaturalLanguageInput({ groupId, members, onParsed }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-slate-600">Type naturally, e.g. <em>Dinner at Jalan Alor RM120 split with Amir and Priya</em>.</p>
-      <Textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Describe the expense..." />
+      <p className="text-sm text-slate-600">
+        Type naturally, e.g. <em>Dinner at Jalan Alor RM120 split with Amir and Priya</em>.
+      </p>
+      <Textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Describe the expense..."
+      />
       {error && <p className="text-sm text-red-600">{error}</p>}
       {warn && <p className="text-sm text-amber-600">{warn}</p>}
-      <Button type="button" onClick={handle} disabled={loading}>{loading ? "Parsing..." : "Parse with Gemini"}</Button>
+      <Button type="button" onClick={handle} disabled={loading}>
+        {loading ? "Parsing..." : "Parse with Gemini"}
+      </Button>
     </div>
   );
 }

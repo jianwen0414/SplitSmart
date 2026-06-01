@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { api, getErrorMessage } from "@/lib/api";
 import { Group, GroupDetail } from "@/lib/types";
 
 export function useGroups() {
@@ -14,17 +14,22 @@ export function useGroups() {
     try {
       const res = await api.get<Group[]>("/groups");
       setGroups(res.data);
-    } catch (e: any) {
-      setError(e?.response?.data?.detail?.message || e?.message || "Failed to load groups");
+    } catch (e: unknown) {
+      setError(getErrorMessage(e, "Failed to load groups"));
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return {
-    groups, loading, error, refresh,
+    groups,
+    loading,
+    error,
+    refresh,
     create: (name: string, description: string, base_currency: string) =>
       api.post<Group>("/groups", { name, description, base_currency }).then((r) => r.data),
     join: (invite_code: string) =>
@@ -44,14 +49,16 @@ export function useGroupDetail(groupId: string | null) {
     try {
       const res = await api.get<GroupDetail>(`/groups/${groupId}`);
       setGroup(res.data);
-    } catch (e: any) {
-      setError(e?.response?.data?.detail?.message || e?.message || "Failed to load group");
+    } catch (e: unknown) {
+      setError(getErrorMessage(e, "Failed to load group"));
     } finally {
       setLoading(false);
     }
   }, [groupId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { group, loading, error, refresh };
 }

@@ -16,12 +16,16 @@ export function Navbar() {
   return (
     <nav className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link href="/groups" className="text-lg font-semibold text-brand-700">SplitSmart</Link>
+        <Link href="/groups" className="text-lg font-semibold text-brand-700">
+          SplitSmart
+        </Link>
         <div className="flex items-center gap-3">
           {user && (
             <>
               <span className="hidden text-sm text-slate-500 sm:inline">{user.email}</span>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>Sign out</Button>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
+                Sign out
+              </Button>
             </>
           )}
         </div>

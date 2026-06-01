@@ -16,7 +16,9 @@ export function Nav() {
         <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
       </nav>
-      <Link href="/login" className="nav-signin mono">Sign in →</Link>
+      <Link href="/login" className="nav-signin mono">
+        Sign in →
+      </Link>
     </header>
   );
 }
@@ -51,9 +53,9 @@ export function StatStrip() {
   return (
     <div className="stat-strip">
       <Stat num="12.4M" label="expenses logged" />
-      <Stat num="183"   label="countries" />
-      <Stat num="$0"    label="to use, forever" />
-      <Stat num="2.1s"  label="avg. expense add" />
+      <Stat num="183" label="countries" />
+      <Stat num="$0" label="to use, forever" />
+      <Stat num="2.1s" label="avg. expense add" />
     </div>
   );
 }
@@ -68,9 +70,21 @@ function Stat({ num, label }: { num: string; label: string }) {
 
 /* ===== HOW IT WORKS ===== */
 const STEPS = [
-  { n: "01", title: "Snap it",   text: "Drop a photo of the receipt. Our scanner reads merchant, total, and line items." },
-  { n: "02", title: "Split it",  text: "Equal, exact, percentage, or shares. Pick people, pick the math, done." },
-  { n: "03", title: "Settle it", text: "We collapse every IOU in the group into one clean transfer per person." },
+  {
+    n: "01",
+    title: "Snap it",
+    text: "Drop a photo of the receipt. Our scanner reads merchant, total, and line items.",
+  },
+  {
+    n: "02",
+    title: "Split it",
+    text: "Equal, exact, percentage, or shares. Pick people, pick the math, done.",
+  },
+  {
+    n: "03",
+    title: "Settle it",
+    text: "We collapse every IOU in the group into one clean transfer per person.",
+  },
 ];
 export function HowItWorks() {
   const [step, setStep] = useState(1);
@@ -147,10 +161,22 @@ function PhoneStep1() {
       <div className="phone-receipt">
         <div className="phone-receipt-head mono">SCANNING…</div>
         <div className="phone-receipt-lines">
-          <div className="rline"><span>Pad Thai</span><span>14.00</span></div>
-          <div className="rline"><span>Som Tum</span><span>11.00</span></div>
-          <div className="rline"><span>Singha ×3</span><span>18.00</span></div>
-          <div className="rline tot"><span>Total</span><span>52.84</span></div>
+          <div className="rline">
+            <span>Pad Thai</span>
+            <span>14.00</span>
+          </div>
+          <div className="rline">
+            <span>Som Tum</span>
+            <span>11.00</span>
+          </div>
+          <div className="rline">
+            <span>Singha ×3</span>
+            <span>18.00</span>
+          </div>
+          <div className="rline tot">
+            <span>Total</span>
+            <span>52.84</span>
+          </div>
         </div>
         <div className="phone-scanline" />
       </div>
@@ -165,8 +191,8 @@ function PhoneStep2() {
   const people = [
     { n: "Mira", c: "#1f5c3b", a: "$13.21" },
     { n: "Theo", c: "#e16850", a: "$13.21" },
-    { n: "Ada",  c: "#7a4914", a: "$13.21" },
-    { n: "You",  c: "#1c3a6e", a: "$13.21" },
+    { n: "Ada", c: "#7a4914", a: "$13.21" },
+    { n: "You", c: "#1c3a6e", a: "$13.21" },
   ];
   return (
     <div className="phone-body">
@@ -174,7 +200,9 @@ function PhoneStep2() {
       <div className="splitters">
         {people.map((p, i) => (
           <div className="splitter" key={i}>
-            <div className="avatar" style={{ background: p.c }}>{p.n[0]}</div>
+            <div className="avatar" style={{ background: p.c }}>
+              {p.n[0]}
+            </div>
             <div className="splitter-name">{p.n}</div>
             <div className="splitter-bar">
               <div className="splitter-fill" style={{ width: "25%", background: p.c }} />
@@ -184,9 +212,15 @@ function PhoneStep2() {
         ))}
       </div>
       <div className="phone-segment mono">
-        <button className="seg seg-on" type="button">EQUAL</button>
-        <button className="seg" type="button">EXACT</button>
-        <button className="seg" type="button">%</button>
+        <button className="seg seg-on" type="button">
+          EQUAL
+        </button>
+        <button className="seg" type="button">
+          EXACT
+        </button>
+        <button className="seg" type="button">
+          %
+        </button>
       </div>
     </div>
   );
@@ -197,8 +231,8 @@ function PhoneStep3() {
       <div className="phone-title serif">Settle up</div>
       <div className="balance-list">
         <BalanceRow color="#1f5c3b" letter="M" name="Mira owes you" amt="+$42.10" sign="pos" />
-        <BalanceRow color="#e16850" letter="T" name="You owe Theo"   amt="−$18.50" sign="neg" />
-        <BalanceRow color="#7a4914" letter="A" name="Ada owes you"   amt="+$7.25"  sign="pos" />
+        <BalanceRow color="#e16850" letter="T" name="You owe Theo" amt="−$18.50" sign="neg" />
+        <BalanceRow color="#7a4914" letter="A" name="Ada owes you" amt="+$7.25" sign="pos" />
       </div>
       <button className="settle-btn mono" type="button">
         Settle all → <span className="serif">$30.85</span>
@@ -206,11 +240,24 @@ function PhoneStep3() {
     </div>
   );
 }
-function BalanceRow({ color, letter, name, amt, sign }:
-  { color: string; letter: string; name: string; amt: string; sign: "pos" | "neg" }) {
+function BalanceRow({
+  color,
+  letter,
+  name,
+  amt,
+  sign,
+}: {
+  color: string;
+  letter: string;
+  name: string;
+  amt: string;
+  sign: "pos" | "neg";
+}) {
   return (
     <div className="bal-row">
-      <div className="avatar sm" style={{ background: color }}>{letter}</div>
+      <div className="avatar sm" style={{ background: color }}>
+        {letter}
+      </div>
       <div className="bal-name">{name}</div>
       <div className={`bal-amt mono ${sign}`}>{amt}</div>
     </div>
@@ -254,8 +301,19 @@ export function FeatureGrid() {
     </section>
   );
 }
-function FeatureCard({ tag, title, desc, kicker, art }:
-  { tag: string; title: string; desc: string; kicker: string; art: React.ReactNode }) {
+function FeatureCard({
+  tag,
+  title,
+  desc,
+  kicker,
+  art,
+}: {
+  tag: string;
+  title: string;
+  desc: string;
+  kicker: string;
+  art: React.ReactNode;
+}) {
   return (
     <article className="feat">
       <div className="feat-tag mono">{tag}</div>
@@ -269,9 +327,9 @@ function FeatureCard({ tag, title, desc, kicker, art }:
 function LedgerArt() {
   const rows = [
     { who: "Mira", what: "Groceries", amt: "$84.20" },
-    { who: "Theo", what: "Gas",       amt: "$42.00" },
-    { who: "You",  what: "Pad Thai",  amt: "$52.84" },
-    { who: "Ada",  what: "Movie",     amt: "$36.00" },
+    { who: "Theo", what: "Gas", amt: "$42.00" },
+    { who: "You", what: "Pad Thai", amt: "$52.84" },
+    { who: "Ada", what: "Movie", amt: "$36.00" },
   ];
   return (
     <div className="art ledger-art">
@@ -283,7 +341,10 @@ function LedgerArt() {
           <span className="led-amt">{r.amt}</span>
         </div>
       ))}
-      <div className="ledger-total mono"><span>SUBTOTAL</span><span>$215.04</span></div>
+      <div className="ledger-total mono">
+        <span>SUBTOTAL</span>
+        <span>$215.04</span>
+      </div>
     </div>
   );
 }
@@ -292,12 +353,30 @@ function ScannerArt() {
     <div className="art scanner-art">
       <div className="scan-receipt">
         <div className="scan-head">CAFÉ NORD</div>
-        <div className="scan-line"><span>Espresso ×2</span><span>6.00</span></div>
-        <div className="scan-line"><span>Croissant</span><span>3.50</span></div>
-        <div className="scan-line"><span>Tartine</span><span>9.50</span></div>
-        <div className="scan-tot"><span>TOTAL</span><span>19.00 €</span></div>
+        <div className="scan-line">
+          <span>Espresso ×2</span>
+          <span>6.00</span>
+        </div>
+        <div className="scan-line">
+          <span>Croissant</span>
+          <span>3.50</span>
+        </div>
+        <div className="scan-line">
+          <span>Tartine</span>
+          <span>9.50</span>
+        </div>
+        <div className="scan-tot">
+          <span>TOTAL</span>
+          <span>19.00 €</span>
+        </div>
         <div className="scan-bars">
-          <div /><div /><div /><div /><div /><div /><div />
+          <div />
+          <div />
+          <div />
+          <div />
+          <div />
+          <div />
+          <div />
         </div>
       </div>
       <div className="scan-bracket tl" />
@@ -310,8 +389,8 @@ function ScannerArt() {
 function CurrencyArt() {
   return (
     <div className="art currency-art">
-      <FxRow from="$100"   to="€92.40" />
-      <FxRow from="£50"    to="¥9,420" />
+      <FxRow from="$100" to="€92.40" />
+      <FxRow from="£50" to="¥9,420" />
       <FxRow from="₹2,000" to="$24.10" />
       <div className="fx-foot mono">Rates updated 4 min ago</div>
     </div>
@@ -333,11 +412,13 @@ export function QuoteSection() {
     <section className="quote">
       <div className="quote-mark serif">&ldquo;</div>
       <p className="quote-text serif">
-        The first app I&rsquo;ve used where settling up actually feels{" "}
-        <em>good</em>. Our group chat is finally just memes again.
+        The first app I&rsquo;ve used where settling up actually feels <em>good</em>. Our group chat
+        is finally just memes again.
       </p>
       <div className="quote-attr mono">
-        <span className="quote-avatar" style={{ background: "#1f5c3b" }}>M</span>
+        <span className="quote-avatar" style={{ background: "#1f5c3b" }}>
+          M
+        </span>
         Mira — Lisbon · 6-person trip
       </div>
     </section>
@@ -358,11 +439,20 @@ export function FinalCTA() {
         <div className="final-ctas">
           <Link href="/register" className="btn btn-primary btn-lg">
             <span>Create your free account</span>
-            <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg
+              viewBox="0 0 24 24"
+              width={18}
+              height={18}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path d="M5 12h14M13 5l7 7-7 7" />
             </svg>
           </Link>
-          <Link href="/login" className="btn btn-ghost btn-lg">I already have one</Link>
+          <Link href="/login" className="btn btn-ghost btn-lg">
+            I already have one
+          </Link>
         </div>
         <div className="final-meta mono">
           NO CREDIT CARD · NO ADS · WORKS OFFLINE · 30-SEC SETUP

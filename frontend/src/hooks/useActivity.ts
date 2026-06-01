@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { api, getErrorMessage } from "@/lib/api";
 import { Activity, ActivityAction } from "@/lib/types";
 
 export function useActivity(groupId: string | null) {
@@ -18,14 +18,16 @@ export function useActivity(groupId: string | null) {
       if (filter !== "all") params.type = filter;
       const res = await api.get<Activity[]>(`/groups/${groupId}/activities`, { params });
       setActivities(res.data);
-    } catch (e: any) {
-      setError(e?.response?.data?.detail?.message || e?.message || "Failed to load activity");
+    } catch (e: unknown) {
+      setError(getErrorMessage(e, "Failed to load activity"));
     } finally {
       setLoading(false);
     }
   }, [groupId, filter]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { activities, loading, error, filter, setFilter, refresh };
 }

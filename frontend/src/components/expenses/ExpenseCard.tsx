@@ -3,9 +3,20 @@ import { Badge } from "@/components/ui/badge";
 import { Expense, Member } from "@/lib/types";
 import { formatMoney } from "@/lib/utils";
 
-export function ExpenseCard({ expense, members, baseCurrency }: { expense: Expense; members: Member[]; baseCurrency?: string }) {
+export function ExpenseCard({
+  expense,
+  members,
+  baseCurrency,
+}: {
+  expense: Expense;
+  members: Member[];
+  baseCurrency?: string;
+}) {
   const payer = members.find((m) => m.user_id === expense.paid_by);
-  const isConverted = expense.converted_amount && baseCurrency && expense.currency.toUpperCase() !== baseCurrency.toUpperCase();
+  const isConverted =
+    expense.converted_amount &&
+    baseCurrency &&
+    expense.currency.toUpperCase() !== baseCurrency.toUpperCase();
   const itemCount = expense.items?.length ?? 0;
   return (
     <Card>
@@ -16,7 +27,9 @@ export function ExpenseCard({ expense, members, baseCurrency }: { expense: Expen
             <Badge>{expense.category}</Badge>
             <Badge variant="brand">{expense.split_type}</Badge>
             {expense.split_type === "itemized" && itemCount > 0 && (
-              <Badge variant="success">{itemCount} item{itemCount === 1 ? "" : "s"}</Badge>
+              <Badge variant="success">
+                {itemCount} item{itemCount === 1 ? "" : "s"}
+              </Badge>
             )}
             {expense.receipt_url && <Badge variant="success">receipt</Badge>}
           </div>
@@ -27,11 +40,17 @@ export function ExpenseCard({ expense, members, baseCurrency }: { expense: Expen
         <div className="text-right">
           {isConverted ? (
             <>
-              <div className="font-semibold text-slate-900">{formatMoney(expense.converted_amount!, baseCurrency!)}</div>
-              <div className="text-xs text-slate-500">{formatMoney(expense.amount, expense.currency)}</div>
+              <div className="font-semibold text-slate-900">
+                {formatMoney(expense.converted_amount!, baseCurrency!)}
+              </div>
+              <div className="text-xs text-slate-500">
+                {formatMoney(expense.amount, expense.currency)}
+              </div>
             </>
           ) : (
-            <div className="font-semibold text-slate-900">{formatMoney(expense.amount, expense.currency)}</div>
+            <div className="font-semibold text-slate-900">
+              {formatMoney(expense.amount, expense.currency)}
+            </div>
           )}
         </div>
       </CardContent>

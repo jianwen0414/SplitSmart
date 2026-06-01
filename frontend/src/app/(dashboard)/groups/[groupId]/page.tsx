@@ -20,13 +20,20 @@ import { SpendingOverTime } from "@/components/dashboard/SpendingOverTime";
 import { MemberContribution } from "@/components/dashboard/MemberContribution";
 import { formatMoney } from "@/lib/utils";
 
-const SettlementConfetti = dynamic(() => import("@/components/three/SettlementConfetti"), { ssr: false });
+const SettlementConfetti = dynamic(() => import("@/components/three/SettlementConfetti"), {
+  ssr: false,
+});
 
 export default function GroupDetailPage({ params }: { params: { groupId: string } }) {
   const { groupId } = params;
   const { group, loading: gLoading } = useGroupDetail(groupId);
   const { expenses, loading: eLoading, refresh: refreshExpenses } = useExpenses(groupId);
-  const { data: balances, loading: bLoading, refresh: refreshBalances, settle } = useBalances(groupId);
+  const {
+    data: balances,
+    loading: bLoading,
+    refresh: refreshBalances,
+    settle,
+  } = useBalances(groupId);
   const { activities, filter, setFilter, refresh: refreshActivity } = useActivity(groupId);
   const { data: analytics, refresh: refreshAnalytics } = useAnalytics(groupId);
   const { user } = useAuth();
@@ -52,26 +59,41 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
       {showConfetti && <SettlementConfetti />}
       <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-1">
-          <Link href="/groups" className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 w-fit">
+          <Link
+            href="/groups"
+            className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 w-fit"
+          >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             All groups
           </Link>
           <h1 className="text-2xl font-semibold text-slate-900">{group.name}</h1>
           <p className="text-sm text-slate-500">
             {group.description || "No description"} ·{" "}
-            <span className="font-mono">code: {group.invite_code}</span> · base {group.base_currency}
+            <span className="font-mono">code: {group.invite_code}</span> · base{" "}
+            {group.base_currency}
           </p>
         </div>
-        <Link href={`/groups/${groupId}/expenses/new`}><Button>Add expense</Button></Link>
+        <Link href={`/groups/${groupId}/expenses/new`}>
+          <Button>Add expense</Button>
+        </Link>
       </header>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Members</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">Members</CardTitle>
+        </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {group.members.map((m) => (
-            <Badge key={m.user_id} variant={m.role === "admin" ? "brand" : "default"}>{m.display_name}</Badge>
+            <Badge key={m.user_id} variant={m.role === "admin" ? "brand" : "default"}>
+              {m.display_name}
+            </Badge>
           ))}
         </CardContent>
       </Card>
@@ -86,9 +108,18 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
 
         <TabsContent value="expenses">
           {eLoading && <p className="text-sm text-slate-500">Loading expenses...</p>}
-          {!eLoading && expenses.length === 0 && <p className="text-sm text-slate-500">No expenses yet.</p>}
+          {!eLoading && expenses.length === 0 && (
+            <p className="text-sm text-slate-500">No expenses yet.</p>
+          )}
           <div className="flex flex-col gap-2">
-            {expenses.map((ex) => <ExpenseCard key={ex.id} expense={ex} members={group.members} baseCurrency={group.base_currency} />)}
+            {expenses.map((ex) => (
+              <ExpenseCard
+                key={ex.id}
+                expense={ex}
+                members={group.members}
+                baseCurrency={group.base_currency}
+              />
+            ))}
           </div>
         </TabsContent>
 
@@ -105,7 +136,12 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
                   currentUserId={user?.id ?? ""}
                   onSettle={async (paid_to, amount, currency) => {
                     await settle(paid_to, amount, currency);
-                    await Promise.all([refreshBalances(), refreshExpenses(), refreshActivity(), refreshAnalytics()]);
+                    await Promise.all([
+                      refreshBalances(),
+                      refreshExpenses(),
+                      refreshActivity(),
+                      refreshAnalytics(),
+                    ]);
                   }}
                 />
               </div>
@@ -131,23 +167,39 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
           ) : (
             <div className="flex flex-col gap-6">
               <Card>
-                <CardHeader><CardTitle className="text-base">Total spending</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-base">Total spending</CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-semibold text-slate-900">{formatMoney(analytics.total_spending, analytics.currency)}</div>
+                  <div className="text-2xl font-semibold text-slate-900">
+                    {formatMoney(analytics.total_spending, analytics.currency)}
+                  </div>
                   <div className="text-xs text-slate-500">{analytics.expense_count} expenses</div>
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-base">By category</CardTitle></CardHeader>
-                <CardContent><SpendingByCategory data={analytics.by_category} /></CardContent>
+                <CardHeader>
+                  <CardTitle className="text-base">By category</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SpendingByCategory data={analytics.by_category} />
+                </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-base">Over time</CardTitle></CardHeader>
-                <CardContent><SpendingOverTime data={analytics.by_date} /></CardContent>
+                <CardHeader>
+                  <CardTitle className="text-base">Over time</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SpendingOverTime data={analytics.by_date} />
+                </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-base">Member contribution</CardTitle></CardHeader>
-                <CardContent><MemberContribution data={analytics.by_member} /></CardContent>
+                <CardHeader>
+                  <CardTitle className="text-base">Member contribution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <MemberContribution data={analytics.by_member} />
+                </CardContent>
               </Card>
             </div>
           )}

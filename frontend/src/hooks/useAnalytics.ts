@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { api, getErrorMessage } from "@/lib/api";
 import { AnalyticsResponse } from "@/lib/types";
 
 export function useAnalytics(groupId: string | null) {
@@ -15,14 +15,16 @@ export function useAnalytics(groupId: string | null) {
     try {
       const res = await api.get<AnalyticsResponse>(`/groups/${groupId}/analytics`);
       setData(res.data);
-    } catch (e: any) {
-      setError(e?.response?.data?.detail?.message || e?.message || "Failed to load analytics");
+    } catch (e: unknown) {
+      setError(getErrorMessage(e, "Failed to load analytics"));
     } finally {
       setLoading(false);
     }
   }, [groupId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { data, loading, error, refresh };
 }

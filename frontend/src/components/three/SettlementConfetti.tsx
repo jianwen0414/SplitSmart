@@ -20,7 +20,11 @@ function ParticleSystem() {
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       out.push({
         pos: new THREE.Vector3((Math.random() - 0.5) * 0.5, 0, (Math.random() - 0.5) * 0.5),
-        vel: new THREE.Vector3((Math.random() - 0.5) * 4, Math.random() * 4 + 4, (Math.random() - 0.5) * 2),
+        vel: new THREE.Vector3(
+          (Math.random() - 0.5) * 4,
+          Math.random() * 4 + 4,
+          (Math.random() - 0.5) * 2
+        ),
         color: new THREE.Color(COLORS[Math.floor(Math.random() * COLORS.length)]),
       });
     }
@@ -59,7 +63,17 @@ function ParticleSystem() {
 
 export default function SettlementConfetti() {
   return (
-    <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", pointerEvents: "none", zIndex: 50 }}>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        pointerEvents: "none",
+        zIndex: 50,
+      }}
+    >
       <Canvas camera={{ position: [0, 0, 10], fov: 50 }} gl={{ alpha: true }}>
         <ambientLight intensity={0.7} />
         <pointLight position={[0, 5, 5]} intensity={0.8} />

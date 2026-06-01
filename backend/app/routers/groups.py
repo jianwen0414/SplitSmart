@@ -1,17 +1,19 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.schemas.group import GroupCreate, GroupUpdate, GroupJoin, GroupRead, GroupDetail
 from app.services import group_service
 from app.utils.auth import get_current_user_id
+from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
 
 @router.post("", response_model=GroupRead, status_code=status.HTTP_201_CREATED)
-async def create(payload: GroupCreate, user_id: UUID = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+@limiter.limit("30/minute")
+async def create(request: Request, payload: GroupCreate, user_id: UUID = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     return await group_service.create_group(db, user_id, payload)
 
 
@@ -21,7 +23,8 @@ async def list_mine(user_id: UUID = Depends(get_current_user_id), db: AsyncSessi
 
 
 @router.post("/join", response_model=GroupRead)
-async def join(payload: GroupJoin, user_id: UUID = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+@limiter.limit("10/minute")
+async def join(request: Request, payload: GroupJoin, user_id: UUID = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     return await group_service.join_group_by_invite(db, user_id, payload.invite_code)
 
 

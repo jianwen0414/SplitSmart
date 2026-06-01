@@ -4,7 +4,8 @@ import { AnalyticsDate } from "@/lib/types";
 
 export function SpendingOverTime({ data }: { data: AnalyticsDate[] }) {
   const chartData = data.map((d) => ({ date: d.date, amount: parseFloat(d.amount) }));
-  if (chartData.length === 0) return <p className="text-sm text-slate-500">No expenses to chart.</p>;
+  if (chartData.length === 0)
+    return <p className="text-sm text-slate-500">No expenses to chart.</p>;
   return (
     <div className="h-72 w-full">
       <ResponsiveContainer>

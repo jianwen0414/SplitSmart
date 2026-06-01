@@ -23,7 +23,7 @@ export function emptyItem(): ItemInput {
 export function computePerMemberSubtotals(
   items: ItemInput[],
   tax: number,
-  service: number,
+  service: number
 ): Record<string, number> {
   const subtotals: Record<string, number> = {};
   let itemTotal = 0;
@@ -50,7 +50,7 @@ export function validateItemizedClientSide(
   items: ItemInput[],
   tax: number,
   service: number,
-  totalAmount: number,
+  totalAmount: number
 ): string | null {
   if (items.length === 0) return "Add at least one item";
   for (let i = 0; i < items.length; i++) {
@@ -58,7 +58,8 @@ export function validateItemizedClientSide(
     if (!item.description.trim()) return `Item #${i + 1} needs a description`;
     if (!(item.unit_amount > 0)) return `Item #${i + 1} unit amount must be > 0`;
     if (!(item.quantity > 0)) return `Item #${i + 1} quantity must be > 0`;
-    if (item.consumers.length === 0) return `Item #${i + 1} ("${item.description}") has no consumers`;
+    if (item.consumers.length === 0)
+      return `Item #${i + 1} ("${item.description}") has no consumers`;
   }
   const itemTotal = items.reduce((acc, it) => acc + it.unit_amount * it.quantity, 0);
   const grand = itemTotal + tax + service;
@@ -68,9 +69,24 @@ export function validateItemizedClientSide(
   return null;
 }
 
-export function ItemizedSplit({ members, totalAmount, items, setItems, tax, setTax, service, setService }: Props) {
-  const subtotals = useMemo(() => computePerMemberSubtotals(items, tax, service), [items, tax, service]);
-  const itemTotal = useMemo(() => items.reduce((acc, it) => acc + it.unit_amount * it.quantity, 0), [items]);
+export function ItemizedSplit({
+  members,
+  totalAmount,
+  items,
+  setItems,
+  tax,
+  setTax,
+  service,
+  setService,
+}: Props) {
+  const subtotals = useMemo(
+    () => computePerMemberSubtotals(items, tax, service),
+    [items, tax, service]
+  );
+  const itemTotal = useMemo(
+    () => items.reduce((acc, it) => acc + it.unit_amount * it.quantity, 0),
+    [items]
+  );
   const grand = itemTotal + tax + service;
   const grandOk = Math.abs(grand - totalAmount) < 0.01 && totalAmount > 0;
 
@@ -144,7 +160,11 @@ export function ItemizedSplit({ members, totalAmount, items, setItems, tax, setT
                       min="1"
                       step="1"
                       value={item.quantity}
-                      onChange={(e) => updateItem(idx, { quantity: Math.max(1, parseInt(e.target.value || "1", 10)) })}
+                      onChange={(e) =>
+                        updateItem(idx, {
+                          quantity: Math.max(1, parseInt(e.target.value || "1", 10)),
+                        })
+                      }
                       className="h-9 w-16 text-right"
                     />
                   </td>
@@ -154,7 +174,9 @@ export function ItemizedSplit({ members, totalAmount, items, setItems, tax, setT
                       min="0"
                       step="0.01"
                       value={item.unit_amount || ""}
-                      onChange={(e) => updateItem(idx, { unit_amount: parseFloat(e.target.value || "0") })}
+                      onChange={(e) =>
+                        updateItem(idx, { unit_amount: parseFloat(e.target.value || "0") })
+                      }
                       className="h-9 w-24 text-right"
                       placeholder="0.00"
                     />
@@ -202,7 +224,9 @@ export function ItemizedSplit({ members, totalAmount, items, setItems, tax, setT
                         ×
                       </button>
                     </div>
-                    <div className="mt-0.5 text-[10px] text-slate-400">line {lineTotal.toFixed(2)}</div>
+                    <div className="mt-0.5 text-[10px] text-slate-400">
+                      line {lineTotal.toFixed(2)}
+                    </div>
                   </td>
                 </tr>
               );
@@ -251,7 +275,9 @@ export function ItemizedSplit({ members, totalAmount, items, setItems, tax, setT
           <span className="text-slate-500">Tax + service</span>
           <span className="font-medium">{(tax + service).toFixed(2)}</span>
         </div>
-        <div className={`mt-1 flex justify-between border-t border-slate-200 pt-1 font-semibold ${grandOk ? "text-emerald-700" : "text-red-600"}`}>
+        <div
+          className={`mt-1 flex justify-between border-t border-slate-200 pt-1 font-semibold ${grandOk ? "text-emerald-700" : "text-red-600"}`}
+        >
           <span>Grand total</span>
           <span>
             {grand.toFixed(2)} / {totalAmount.toFixed(2)} {grandOk ? "✓" : "✗"}

@@ -34,7 +34,10 @@ function describe(a: Activity, name: string): string {
 }
 
 export function ActivityFeed({
-  activities, members, filter, setFilter,
+  activities,
+  members,
+  filter,
+  setFilter,
 }: {
   activities: Activity[];
   members: Member[];
@@ -52,7 +55,9 @@ export function ActivityFeed({
             onClick={() => setFilter(f.key)}
             className={cn(
               "rounded-full border px-3 py-1 text-xs font-medium transition",
-              filter === f.key ? "border-brand-600 bg-brand-50 text-brand-700" : "border-slate-200 text-slate-600 hover:bg-slate-100",
+              filter === f.key
+                ? "border-brand-600 bg-brand-50 text-brand-700"
+                : "border-slate-200 text-slate-600 hover:bg-slate-100"
             )}
           >
             {f.label}

@@ -30,7 +30,9 @@ export function SettlementPlan({ plan, currentUserId, onSettle }: Props) {
                 <span className="font-medium text-slate-900">{t.from.display_name}</span>
                 <span className="text-slate-500"> pays </span>
                 <span className="font-medium text-slate-900">{t.to.display_name}</span>
-                <span className="ml-2 font-semibold text-brand-700">{formatMoney(t.amount, t.currency)}</span>
+                <span className="ml-2 font-semibold text-brand-700">
+                  {formatMoney(t.amount, t.currency)}
+                </span>
               </div>
               {isMyDebt && (
                 <Button

@@ -1,5 +1,14 @@
 "use client";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
+} from "recharts";
 import { AnalyticsMember } from "@/lib/types";
 
 export function MemberContribution({ data }: { data: AnalyticsMember[] }) {

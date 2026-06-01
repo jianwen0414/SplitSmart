@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import { createHeroScene } from "./three/createHeroScene";
 
-/* Thin React wrapper for the vanilla Three.js hero scene.
-   The 3D scene runs entirely outside React; we just attach it to a div. */
+/* Canvas-only mount for vanilla Three.js hero scene.
+   Renders an empty div the 3D scene attaches to. */
 
-export default function HeroScene({ children }: { children?: ReactNode }) {
+export default function HeroScene() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -17,10 +17,5 @@ export default function HeroScene({ children }: { children?: ReactNode }) {
     };
   }, []);
 
-  return (
-    <div className="hero-stage">
-      <div ref={containerRef} className="hero-3d-canvas" />
-      {children}
-    </div>
-  );
+  return <div ref={containerRef} className="hero-3d-canvas" />;
 }

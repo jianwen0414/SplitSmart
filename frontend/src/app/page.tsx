@@ -33,7 +33,8 @@ export default function LandingPage() {
       <Nav />
 
       <section className="hero">
-        <HeroScene>
+        <div className="hero-stage">
+          <HeroScene />
           <div className="hero-text-layer">
             <div className="hero-copy">
               <div className="eyebrow mono">
@@ -48,18 +49,27 @@ export default function LandingPage() {
               </h1>
 
               <p className="hero-sub">
-                Track who paid, who owes, and settle the whole thing in a tap.
-                No math, no spreadsheets, no &ldquo;I&rsquo;ll Venmo you later.&rdquo;
+                Track who paid, who owes, and settle the whole thing in a tap. No math, no
+                spreadsheets, no &ldquo;I&rsquo;ll Venmo you later.&rdquo;
               </p>
 
               <div className="hero-ctas">
                 <Link href="/register" className="btn btn-primary">
                   <span>Get started</span>
-                  <svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2}>
+                  <svg
+                    viewBox="0 0 24 24"
+                    width={16}
+                    height={16}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
                     <path d="M5 12h14M13 5l7 7-7 7" />
                   </svg>
                 </Link>
-                <Link href="/login" className="btn btn-ghost">Sign in</Link>
+                <Link href="/login" className="btn btn-ghost">
+                  Sign in
+                </Link>
               </div>
 
               <div className="hero-hint mono">
@@ -68,7 +78,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-        </HeroScene>
+        </div>
       </section>
 
       <ScrollMarquee />

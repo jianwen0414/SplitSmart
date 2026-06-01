@@ -40,16 +40,33 @@ export default function LoginPage() {
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" disabled={submitting}>{submitting ? "Signing in..." : "Sign in"}</Button>
+            <Button type="submit" disabled={submitting}>
+              {submitting ? "Signing in..." : "Sign in"}
+            </Button>
             <p className="text-center text-sm text-slate-500">
-              No account? <Link href="/register" className="text-brand-600 hover:underline">Register</Link>
+              No account?{" "}
+              <Link href="/register" className="text-brand-600 hover:underline">
+                Register
+              </Link>
             </p>
           </form>
         </CardContent>

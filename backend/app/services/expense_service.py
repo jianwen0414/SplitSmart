@@ -372,6 +372,9 @@ async def update_expense(session: AsyncSession, expense_id: UUID, payload: Expen
         expense.tax_amount = new_tax
         expense.service_charge_amount = new_service
 
+    if "paid_by" in data and data["paid_by"] != expense.paid_by:
+        await _verify_group_members(session, expense.group_id, [data["paid_by"]])
+
     for field in ("currency", "description", "category", "date", "paid_by", "receipt_url"):
         if field in data:
             setattr(expense, field, data[field])

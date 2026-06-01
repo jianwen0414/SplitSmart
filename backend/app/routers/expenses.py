@@ -1,11 +1,12 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseRead, SplitRead, ItemRead, ItemConsumerRead
 from app.services import expense_service, group_service
 from app.utils.auth import get_current_user_id
+from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/groups/{group_id}/expenses", tags=["expenses"])
 
@@ -43,7 +44,8 @@ async def _to_read(db: AsyncSession, expense) -> ExpenseRead:
 
 
 @router.post("", response_model=ExpenseRead, status_code=status.HTTP_201_CREATED)
-async def create(group_id: UUID, payload: ExpenseCreate, user_id: UUID = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+@limiter.limit("30/minute")
+async def create(request: Request, group_id: UUID, payload: ExpenseCreate, user_id: UUID = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     await _assert_membership(db, group_id, user_id)
     expense = await expense_service.create_expense(db, group_id, payload, user_id)
     return await _to_read(db, expense)
