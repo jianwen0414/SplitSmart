@@ -18,7 +18,10 @@ _engine = create_async_engine(
     pool_recycle=300,
     pool_size=5,
     max_overflow=10,
-    connect_args={"ssl": "require"},
+    # statement_cache_size=0 disables asyncpg prepared statements, required
+    # behind Supabase's Supavisor pooler (connections are reassigned between
+    # requests, so cached prepared statements vanish -> "... does not exist").
+    connect_args={"ssl": "require", "statement_cache_size": 0},
 ) if _settings.DATABASE_URL else None
 _SessionLocal = async_sessionmaker(_engine, expire_on_commit=False, class_=AsyncSession) if _engine else None
 
